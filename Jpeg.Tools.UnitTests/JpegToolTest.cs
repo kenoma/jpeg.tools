@@ -154,6 +154,7 @@ namespace Jpeg.Tools.UnitTests
                 }
             }
             Assert.Pass();
+
         }
 
         [Test, Explicit]
