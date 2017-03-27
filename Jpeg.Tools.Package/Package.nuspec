@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>CvLab.Jpeg.Tools</id>
+    <version>0.1.0</version>
+    <title>CvLab.Jpeg.Tools</title>
+    <authors>Gurov</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>C# wrapper for jpegtran-like routines for jpeg optimizations task.</description>
+    <iconUrl>\\192.168.0.51\ResourcesGit\icon\jpegtools.png</iconUrl>
+    <references>
+      <reference file="Jpeg.Tools.dll" />
+    </references>
+  </metadata>
+  <files>
+	<file src="lib\net20\Jpeg.Tools.dll" target="lib\net20\Jpeg.Tools.dll" />
+  </files>
+</package>

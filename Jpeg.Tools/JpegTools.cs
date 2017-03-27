@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 
 namespace Jpeg.Tools
 {
@@ -16,10 +12,15 @@ namespace Jpeg.Tools
 
         static JpegTools()
         {
-            var subfolder = IntPtr.Size==8 ? "x64" : "x86";
+            var dllFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dll);
             _finalise = new Destructor();
-            //Log.Info($"Trying to load {Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subfolder, dll)}...");
-            _lib = LoadLibrary(Path.Combine(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subfolder), dll));
+            
+            if (IntPtr.Size == 8)
+                File.WriteAllBytes(dllFile, Resources.native_libjpeg_x64);
+            else
+                File.WriteAllBytes(dllFile, Resources.native_libjpeg_x86);
+
+            _lib = LoadLibrary(dllFile);
             if (_lib == IntPtr.Zero)
             {
                 throw new DllNotFoundException(dll);
