@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -88,12 +89,25 @@ namespace Jpeg.Tools.UnitTests
         }
 
         [Test]
+        public void Transform_MemoryToMemory_ScalingTest()
+        {
+            var jpeg = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tu.jpg"));
+
+            if (JpegTools.Transform(jpeg, out byte[] res, copy: false, optimize: false, scaleFactorM: 1))
+            {
+                Assert.Greater(jpeg.Length, res.Length);
+            }
+            else
+                Assert.Fail();
+        }
+
+        [Test]
         public void Transform_MemoryToMemory_CorruptedInput()
         {
             var nonjpeg = new byte[100];
 
             var retval = JpegTools.Transform(nonjpeg, out byte[] res, copy: false, optimize: true);
-            
+
             Assert.IsFalse(retval);
         }
 
@@ -174,6 +188,14 @@ namespace Jpeg.Tools.UnitTests
             File.Delete(output);
         }
 
+        private Size GetImageDim(byte[] data)
+        {
+            using (var ms = new MemoryStream(data))
+            using (var bmp = Bitmap.FromStream(ms))
+            {
+                return new Size(bmp.Width, bmp.Height);
+            }
+        }
 
         bool IsJpegImage(string filename)
         {

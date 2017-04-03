@@ -14,12 +14,14 @@ namespace Jpeg.Tools
         {
             var dllFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dll);
             _finalise = new Destructor();
-            
-            if (IntPtr.Size == 8)
-                File.WriteAllBytes(dllFile, Resources.native_libjpeg_x64);
-            else
-                File.WriteAllBytes(dllFile, Resources.native_libjpeg_x86);
 
+            if (!File.Exists(dllFile))
+            {
+                if (IntPtr.Size == 8)
+                    File.WriteAllBytes(dllFile, Resources.native_libjpeg_x64);
+                else
+                    File.WriteAllBytes(dllFile, Resources.native_libjpeg_x86);
+            }
             _lib = LoadLibrary(dllFile);
             if (_lib == IntPtr.Zero)
             {
@@ -39,8 +41,24 @@ namespace Jpeg.Tools
         [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
         private static extern byte OptimizeMemoryToFile([In] byte[] input, int size, [In] string outfilename, byte copy, byte optimize, byte progressive, byte grayscale, byte trim, byte arithmetic);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="size"></param>
+        /// <param name="output"></param>
+        /// <param name="outSize"></param>
+        /// <param name="copy"></param>
+        /// <param name="optimize"></param>
+        /// <param name="progressive"></param>
+        /// <param name="grayscale"></param>
+        /// <param name="trim"></param>
+        /// <param name="arithmetic"></param>
+        /// <param name="scale_m">Scaling factor m, currently supported scale factors are M/N with all M from 1 to 16, where N is the source DCT size, which is 8 for baseline JPEG</param>
+        /// <param name="scale_n">Scalling factor n, Currently supported scale factors are M/N with all M from 1 to 16, where N is the source DCT size, which is 8 for baseline JPEG</param>
+        /// <returns></returns>
         [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-        private static extern byte OptimizeMemoryToMemory([In] byte[] input, [In] uint size, [In, Out] byte[] output, [Out] out uint outSize, byte copy, byte optimize, byte progressive, byte grayscale, byte trim, byte arithmetic);
+        private static extern byte OptimizeMemoryToMemory([In] byte[] input, [In] uint size, [In, Out] byte[] output, [Out] out uint outSize, byte copy, byte optimize, byte progressive, byte grayscale, byte trim, byte arithmetic, byte scale_m, byte scale_n);
 
         /// <summary>
         /// Tries the optimize JPEG.
@@ -128,8 +146,10 @@ namespace Jpeg.Tools
         /// <param name="grayscale">if set to <c>true</c> [grayscale].</param>
         /// <param name="trim">if set to <c>true</c> [trim].</param>
         /// <param name="arithmetic">if set to <c>true</c> [arithmetic].</param>
+        /// <param name="scaleFactorM">M/N, where M is in [1,16] any value outside of this range leads to ignoring scaling</param>
+        /// <param name="scaleFactorN">M/N, where N is the source DCT size</param>
         /// <returns></returns>
-        static public bool Transform(byte[] jpegInMemory, out byte[] resultingJpeg, bool copy = false, bool optimize = true, bool progressive = false, bool grayscale = false, bool trim = false, bool arithmetic = false)
+        static public bool Transform(byte[] jpegInMemory, out byte[] resultingJpeg, bool copy = false, bool optimize = true, bool progressive = false, bool grayscale = false, bool trim = false, bool arithmetic = false, byte scaleFactorM=0, byte scaleFactorN=8)
         {
             resultingJpeg = null;
 
@@ -151,7 +171,9 @@ namespace Jpeg.Tools
                     (byte)(progressive ? 1 : 0),
                     (byte)(grayscale ? 1 : 0),
                     (byte)(trim ? 1 : 0),
-                    (byte)(arithmetic ? 1 : 0));
+                    (byte)(arithmetic ? 1 : 0),
+                    scaleFactorM,
+                    scaleFactorN);
 
                 if (outSize > jpegInMemory.Length)
                     return false;
