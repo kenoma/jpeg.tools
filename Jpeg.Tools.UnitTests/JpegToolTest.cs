@@ -93,7 +93,7 @@ namespace Jpeg.Tools.UnitTests
         {
             var jpeg = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tu.jpg"));
 
-            if (JpegTools.Transform(jpeg, out byte[] res, copy: false, optimize: false, scaleFactorM: 1))
+            if (JpegTools.Transform(jpeg, out byte[] res, copy: false, optimize: false, scaleFactorM: 1,scaleFactorN:2))
             {
                 Assert.Greater(jpeg.Length, res.Length);
             }

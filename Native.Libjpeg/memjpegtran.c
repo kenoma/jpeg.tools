@@ -99,12 +99,12 @@ __declspec(dllexport) char OptimizeMemoryToMemory(
 	srcinfo.mem->max_memory_to_use = dstinfo.mem->max_memory_to_use;
 	jpeg_mem_src(&srcinfo, inputbuffer, inputsize);
 	jcopy_markers_setup(&srcinfo, copy);
-
+	//jpeg_set_quality(&srcinfo, 100, TRUE /* limit to baseline-JPEG values */);
 	(void)jpeg_read_header(&srcinfo, TRUE);
 	if (scale_m > 0 && scale_m < 17)
 	{
 		srcinfo.scale_num = scale_m;
-		//srcinfo.scale_denom = scale_n;
+		srcinfo.scale_denom = scale_n;
 	}
 
 	if (!jtransform_request_workspace(&srcinfo, &transformoption))
