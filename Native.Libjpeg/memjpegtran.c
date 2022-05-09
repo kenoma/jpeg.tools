@@ -48,7 +48,12 @@ __declspec(dllexport) char OptimizeMemoryToMemory(
 	char trim,
 	char arithmetic,
 	char scale_m,
-	char scale_n)
+	char scale_n,
+	char crop,
+	int cropx,
+	int cropy,
+	int cropw,
+	int croph)
 {
 	struct jpeg_decompress_struct srcinfo;
 	struct jpeg_compress_struct dstinfo;
@@ -63,12 +68,27 @@ __declspec(dllexport) char OptimizeMemoryToMemory(
 	transformoption.perfect = FALSE;
 	transformoption.trim = trim;
 	transformoption.force_grayscale = grayscale;
-	transformoption.crop = FALSE;
-	transformoption.crop_width_set = JCROP_UNSET;
-	transformoption.crop_height_set = JCROP_UNSET;
-	transformoption.crop_xoffset_set = JCROP_UNSET;
-	transformoption.crop_yoffset_set = JCROP_UNSET;
+	if (crop) 
+	{
+		transformoption.crop = TRUE;
+		transformoption.crop_width_set = JCROP_POS;
+		transformoption.crop_width = cropw;
+		transformoption.crop_height_set = JCROP_POS;
+		transformoption.crop_height = croph;
+		transformoption.crop_xoffset_set = JCROP_POS;
+		transformoption.crop_xoffset = cropx;
+		transformoption.crop_yoffset_set = JCROP_POS;
+		transformoption.crop_yoffset = cropy;
 
+	}
+	else 
+	{
+		transformoption.crop = FALSE;
+		transformoption.crop_width_set = JCROP_UNSET;
+		transformoption.crop_height_set = JCROP_UNSET;
+		transformoption.crop_xoffset_set = JCROP_UNSET;
+		transformoption.crop_yoffset_set = JCROP_UNSET;
+	}
 	srcinfo.err = jpeg_std_error(&jsrcerr.pub);
 	jsrcerr.pub.error_exit = memjpegtran_error_exit;
 	jpeg_create_decompress(&srcinfo);
