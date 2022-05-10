@@ -56,9 +56,14 @@ namespace Jpeg.Tools
         /// <param name="arithmetic"></param>
         /// <param name="scale_m">Scaling factor m, currently supported scale factors are M/N with all M from 1 to 16, where N is the source DCT size, which is 8 for baseline JPEG</param>
         /// <param name="scale_n">Scalling factor n, Currently supported scale factors are M/N with all M from 1 to 16, where N is the source DCT size, which is 8 for baseline JPEG</param>
+        /// <param name="crop">Enable cropping</param>
+        /// <param name="cropx">Crop x</param>
+        /// <param name="cropy">Crop y</param>
+        /// <param name="cropw">Crop width</param>
+        /// <param name="croph">Crop Height</param>
         /// <returns></returns>
         [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-        private static extern byte OptimizeMemoryToMemory([In] byte[] input, [In] uint size, [In, Out] byte[] output, [Out] out uint outSize, byte copy, byte optimize, byte progressive, byte grayscale, byte trim, byte arithmetic, byte scale_m, byte scale_n);
+        private static extern byte OptimizeMemoryToMemory([In] byte[] input, [In] uint size, [In, Out] byte[] output, [Out] out uint outSize, byte copy, byte optimize, byte progressive, byte grayscale, byte trim, byte arithmetic, byte scale_m, byte scale_n, byte crop, int cropx, int cropy, int cropw, int croph);
 
         /// <summary>
         /// Tries the optimize JPEG.
@@ -149,7 +154,7 @@ namespace Jpeg.Tools
         /// <param name="scaleFactorM">M/N, where M is in [1,16] any value outside of this range leads to ignoring scaling</param>
         /// <param name="scaleFactorN">M/N, where N is the source DCT size</param>
         /// <returns></returns>
-        static public bool Transform(byte[] jpegInMemory, out byte[] resultingJpeg, bool copy = false, bool optimize = true, bool progressive = false, bool grayscale = false, bool trim = false, bool arithmetic = false, byte scaleFactorM=0, byte scaleFactorN=8)
+        static public bool Transform(byte[] jpegInMemory, out byte[] resultingJpeg, bool copy = false, bool optimize = true, bool progressive = false, bool grayscale = false, bool trim = false, bool arithmetic = false, byte scaleFactorM=0, byte scaleFactorN=8, bool crop = false, int cropx =-1, int cropy =-1, int cropw =-1, int croph=-1)
         {
             resultingJpeg = null;
 
@@ -173,7 +178,12 @@ namespace Jpeg.Tools
                     (byte)(trim ? 1 : 0),
                     (byte)(arithmetic ? 1 : 0),
                     scaleFactorM,
-                    scaleFactorN);
+                    scaleFactorN,
+                    (byte)(crop ? 1 : 0),
+                    cropx,
+                    cropy,
+                    cropw,
+                    croph);
 
                 if (outSize > jpegInMemory.Length)
                     return false;

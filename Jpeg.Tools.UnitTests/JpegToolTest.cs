@@ -188,6 +188,22 @@ namespace Jpeg.Tools.UnitTests
             File.Delete(output);
         }
 
+
+        [Test, Explicit]
+        public void Transform_Crop()
+        {
+            var jpeg = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tu.jpg"));
+            byte[] output;
+            for (var i = 0; i < 1000; i++)
+            {
+                if (!JpegTools.Transform(jpeg, out output, crop : true, cropx:160, cropy:160, cropw:320, croph:320  ))
+                {
+                    Assert.Fail();
+                }
+                Assert.IsTrue(output.Length > 0);
+            }
+        }
+
         private Size GetImageDim(byte[] data)
         {
             using (var ms = new MemoryStream(data))
